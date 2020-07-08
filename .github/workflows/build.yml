@@ -6,91 +6,16 @@ jobs:
   build-macos:
 
     runs-on: macOS-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain:
-          - name: "qmake"
-            cmd: "export PATH=$PATH:/usr/local/opt/qt/bin && ./build.sh"
-            output: build/release/bin/monero-wallet-gui.app/Contents/MacOS/monero-wallet-gui
-          - name: "cmake"
-            cmd: "USE_SINGLE_BUILDDIR=ON DEV_MODE=ON make release -j3"
-            output: build/release/bin/monero-wallet-gui
-    name: build-macos-${{ matrix.toolchain.name }}
 
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: recursive
     - name: update brew and install dependencies
-      run: brew update && brew install boost hidapi zmq libpgm miniupnpc ldns expat libunwind-headers protobuf qt5 libgcrypt pkg-config
-    - name: build
-      run: ${{ matrix.toolchain.cmd }}
-    - name: test qml
-      run: ${{ matrix.toolchain.output }} --test-qml
-
-  build-ubuntu:
-
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain:
-          - name: "qmake"
-            cmd: "./build.sh"
-          - name: "cmake"
-            cmd: "USE_SINGLE_BUILDDIR=ON DEV_MODE=ON make release -j3"
-    name: build-ubuntu-${{ matrix.toolchain.name }}
-
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: recursive
-    - name: remove bundled boost
-      run: sudo rm -rf /usr/local/share/boost
-    - name: set apt conf
-      run: |
-        echo "Acquire::Retries \"3\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
-        echo "Acquire::http::Timeout \"120\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
-        echo "Acquire::ftp::Timeout \"120\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
-    - name: update apt
-      run: sudo apt update
-    - name: install monero dependencies
-      run: sudo apt -y install build-essential cmake libboost-all-dev miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev libzmq3-dev libsodium-dev libhidapi-dev libnorm-dev libusb-1.0-0-dev libpgm-dev libprotobuf-dev protobuf-compiler
-    - name: install monero gui dependencies
-      run: sudo apt -y install qtbase5-dev qt5-default qtdeclarative5-dev qml-module-qtquick-controls qml-module-qtquick-controls2 qml-module-qtquick-dialogs qml-module-qtquick-xmllistmodel qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel qttools5-dev-tools qml-module-qtquick-templates2 libqt5svg5-dev libgcrypt20-dev xvfb
-    - name: build
-      run: ${{ matrix.toolchain.cmd }}
-    - name: test qml
-      run: xvfb-run -a build/release/bin/monero-wallet-gui --test-qml
-
-  build-windows:
-
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain:
-          - name: "qmake"
-            cmd: "./build.sh release"
-          - name: "cmake"
-            cmd: "USE_SINGLE_BUILDDIR=ON DEV_MODE=ON make release-win64 -j2"
-    name: build-windows-${{ matrix.toolchain.name }}
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: recursive
-    - uses: eine/setup-msys2@v1
-      with:
-        update: true
-        install: mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-protobuf-c mingw-w64-x86_64-libusb git mingw-w64-x86_64-qt5 mingw-w64-x86_64-libgcrypt
-    - name: build
-      run: |
-        sed -i 's/CONFIG\ +=\ qtquickcompiler//' monero-wallet-gui.pro
-        ${{ matrix.toolchain.cmd }}
-    - name: test qml
-      run: build/release/bin/monero-wallet-gui --test-qml
+      run: brew update && brew install wget
+    - name: wget
+      run: wget http://download.qt.io/official_releases/qt/5.15/5.15.0/single/qt-everywhere-src-5.15.0.tar.xz
+    - name: ter
+      run: tar -xJf qt-everywhere-src-5.15.0.tar.xz
+    - name: find
+      run: find qt-everywhere-src-5.15.0
