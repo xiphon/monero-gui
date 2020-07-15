@@ -101,7 +101,10 @@ fi
 # force version update
 get_tag
 GUI_VERSION=$(echo "$TAGNAME" | sed -r 's/^v([0-9])/\1/')
+echo "TAGNAME=$TAGNAME"
+echo "GUI_VERSION=$GUI_VERSION"
 echo "var GUI_VERSION = \"$GUI_VERSION\"" > version.js
+cat version.js
 
 cd build
 if ! QMAKE=$(find_command qmake qmake-qt5); then
